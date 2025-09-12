@@ -261,8 +261,8 @@ class PaperCloak {
 
             const progressFill = document.getElementById('progress-fill');
             const progressText = document.getElementById('progress-text');
-
             let progress = 0;
+
             const interval = setInterval(() => {
                 progress += 10;
                 if (progressFill) {
@@ -320,7 +320,6 @@ class PaperCloak {
     showConfigSection() {
         try {
             console.log('Showing config section...');
-
             const sections = ['upload-progress', 'upload-section', 'processing-section', 'preview-section'];
             sections.forEach(sectionId => {
                 const element = document.getElementById(sectionId);
@@ -344,7 +343,6 @@ class PaperCloak {
     async transformToPaper() {
         try {
             console.log('Transforming to paper...');
-
             if (!this.pdfText.trim()) {
                 alert('No content available. Please upload a PDF.');
                 return;
@@ -393,7 +391,6 @@ class PaperCloak {
 
             let statusIndex = 0;
             const statusElement = document.getElementById('processing-status');
-
             const statusInterval = setInterval(() => {
                 if (statusElement && statusIndex < statuses.length) {
                     statusElement.textContent = statuses[statusIndex];
@@ -423,370 +420,247 @@ class PaperCloak {
             const layoutClass = this.currentConfig.layout === 'double' ? 'two-column' : 'single-column';
 
             return `
-                <div class="paper ${layoutClass}">
+                <div class="academic-paper ${layoutClass}">
                     <div class="paper-title">${title}</div>
-                    <div class="authors">${authors}</div>
-                    <div class="institution">${institution}</div>
-                    
-                    <div class="abstract">
+                    <div class="paper-authors">${authors}</div>
+                    <div class="paper-institution">${institution}</div>
+
+                    <div class="paper-abstract">
                         <h3>Abstract</h3>
                         <p>${abstract}</p>
                     </div>
-                    
-                    <div class="keywords">
+
+                    <div class="paper-keywords">
                         <strong>Keywords:</strong> ${keywords}
                     </div>
-                    
-                    ${sections}
-                    
+
+                    ${Object.keys(sections).map(type => {
+                        const title = type.charAt(0).toUpperCase() + type.slice(1);
+                        return `
+                            <div class="section">
+                                <h2 class="section-header">${title}</h2>
+                                <div class="section-content">
+                                    ${sections[type].split('\n\n').map(p => `<p>${this.preserveFormatting(p.trim())}</p>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+
                     <div class="references">
-                        <h2>References</h2>
+                        <h3>References</h3>
                         <ol>
-                            ${references.map(ref => `<li>${ref}</li>`).join('')}
+                            ${references.map(ref => `<li class="reference-item">${ref}</li>`).join('')}
                         </ol>
                     </div>
                 </div>
             `;
         } catch (error) {
             console.error('Error generating academic paper:', error);
-            return '<div class="error">Error generating paper content. Please try again.</div>';
+            return '<div class="error">Error generating paper content</div>';
         }
-    }
-
-    generatePaperData() {
-        return {
-            sample_authors: [
-                'Dr. Sarah Johnson',
-                'Prof. Michael Chen',
-                'Dr. Emily Rodriguez',
-                'Prof. David Thompson',
-                'Dr. Amanda Wilson',
-                'Prof. James Park',
-                'Dr. Lisa Anderson',
-                'Prof. Robert Kim'
-            ],
-            sample_institutions: [
-                'Department of Research, University of Excellence',
-                'Institute for Advanced Studies, Metropolitan University',
-                'School of Sciences, Academic Research Center',
-                'Department of Innovation, Technology Institute',
-                'Center for Research Excellence, State University'
-            ],
-            journal_names: [
-                'Journal of Advanced Research',
-                'International Review of Studies',
-                'Quarterly Journal of Science',
-                'Annual Review of Research',
-                'Journal of Contemporary Analysis',
-                'International Journal of Innovation',
-                'Research Quarterly Review',
-                'Journal of Applied Sciences'
-            ],
-            method_terms: [
-                'systematic data collection',
-                'experimental protocols',
-                'established guidelines',
-                'statistical analysis',
-                'quality control measures',
-                'data integrity'
-            ],
-            result_terms: [
-                'significant correlations',
-                'Statistical analysis',
-                'patterns',
-                'comprehensive evaluation',
-                'Comparative analysis'
-            ]
-        };
     }
 
     extractSectionsFromPdf() {
-        if (!this.pdfText) {
-            return this.generateDefaultSections();
+        const sections = {};
+        const text = this.pdfText;
+
+        if (text.length < 1000) {
+            return this.getDefaultSections();
         }
 
-        const paragraphs = this.pdfText.split('\n\n').filter(p => p.trim().length > 50);
-        const sectionTypes = ['introduction', 'methods', 'results', 'discussion', 'conclusion'];
-        const sections = {};
+        const chunks = text.split(/\n\s*\n/).filter(chunk => chunk.trim().length > 50);
+        const sectionTypes = ['introduction', 'methodology', 'results', 'discussion', 'conclusion'];
 
-        sectionTypes.forEach((type, index) => {
-            const startIndex = Math.floor((paragraphs.length / sectionTypes.length) * index);
-            const endIndex = Math.floor((paragraphs.length / sectionTypes.length) * (index + 1));
-            const sectionParagraphs = paragraphs.slice(startIndex, endIndex);
-            
-            if (sectionParagraphs.length > 0) {
-                sections[type] = sectionParagraphs
-                    .map(p => `<p>${this.preserveFormatting(p.trim())}</p>`)
-                    .join('');
+        chunks.forEach((chunk, index) => {
+            const sectionType = sectionTypes[index % sectionTypes.length];
+            if (!sections[sectionType]) {
+                sections[sectionType] = '';
+            }
+            sections[sectionType] += chunk.trim() + '\n\n';
+        });
+
+        Object.keys(sections).forEach(key => {
+            if (sections[key].length > 2000) {
+                sections[key] = sections[key].substring(0, 2000) + '...';
             }
         });
 
-        return Object.keys(sections).map(type => {
-            const title = type.charAt(0).toUpperCase() + type.slice(1);
-            return `
-                <div class="section">
-                    <h2>${title}</h2>
-                    ${sections[type] || this.generateDefaultSectionContent(type)}
-                </div>
-            `;
-        }).join('');
+        return sections;
     }
 
-    generateDefaultSectionContent(sectionType) {
+    getDefaultSections() {
         const templates = {
-            introduction: `<p>This study investigates important aspects within the field of ${this.currentConfig.field}. Current research has identified several key areas requiring further investigation. The primary objective of this research is to contribute to our understanding of these complex phenomena.</p><p>The methodology employed in this study builds upon established frameworks while incorporating novel approaches to data analysis.</p>`,
-            methodology: `<p>The experimental design incorporated systematic data collection with careful attention to established protocols. Data collection procedures followed standard guidelines for research in ${this.currentConfig.field}. Statistical analysis was conducted using appropriate software packages.</p>`,
-            results: `<p>The analysis revealed significant relationships between key variables. Results indicate patterns consistent with theoretical predictions. Statistical evaluation established clear trends supporting the primary hypothesis of this investigation.</p>`,
-            discussion: `<p>These findings contribute significantly to our understanding of the subject matter. The results align with previous research while revealing novel insights. The implications of these discoveries extend beyond the immediate scope of this study.</p>`,
-            conclusion: `<p>In conclusion, this research provides valuable evidence supporting the main hypotheses. The findings have practical implications for future work in ${this.currentConfig.field}. Continued investigation in this area will enhance our theoretical understanding and practical applications.</p>`
+            introduction: `This study investigates important aspects within the field of ${this.currentConfig.field}. Current research has identified several key areas requiring further investigation. The primary objective of this research is to contribute to our understanding of these complex phenomena.\n\nThe methodology employed in this study builds upon established frameworks while incorporating novel approaches to data analysis.`,
+
+            methodology: `The experimental design incorporated systematic data collection with careful attention to established protocols. Data collection procedures followed standard guidelines for research in ${this.currentConfig.field}. Statistical analysis was conducted using appropriate software packages.`,
+
+            results: `The analysis revealed significant relationships between key variables. Results indicate patterns consistent with theoretical predictions. Statistical evaluation established clear trends supporting the primary hypothesis of this investigation.`,
+
+            discussion: `These findings contribute significantly to our understanding of the subject matter. The results align with previous research while revealing novel insights. The implications of these discoveries extend beyond the immediate scope of this study.`,
+
+            conclusion: `In conclusion, this research provides valuable evidence supporting the main hypotheses. The findings have practical implications for future work in ${this.currentConfig.field}. Continued investigation in this area will enhance our theoretical understanding and practical applications.`
         };
 
-        return templates[sectionType] || '<p>Content analysis and interpretation will be presented in this section.</p>';
+        return templates[sectionType] || `Content analysis and interpretation will be presented in this section.`;
     }
 
     preserveFormatting(text) {
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
             .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/\n/g, '<br>');
+            .replace(/__(.*?)__/g, '<u>$1</u>');
+    }
+
+    generatePaperData() {
+        return {
+            field: this.currentConfig.field,
+            textLength: this.pdfText.length,
+            wordCount: this.pdfText.split(/\s+/).length,
+            hasMethodology: this.pdfText.toLowerCase().includes('method'),
+            hasResults: this.pdfText.toLowerCase().includes('result'),
+            hasReferences: this.pdfText.toLowerCase().includes('reference')
+        };
     }
 
     generateTitle() {
         const field = this.currentConfig.field;
-        const titleTemplates = [
-            `Advanced Studies in ${field}: A Comprehensive Analysis`,
-            `Investigating Key Phenomena in ${field} Research`,
-            `Novel Approaches to ${field}: Methodology and Applications`,
-            `Contemporary Perspectives on ${field} Theory and Practice`,
-            `Analytical Framework for ${field} Research Development`
-        ];
-        return titleTemplates[Math.floor(Math.random() * titleTemplates.length)];
-    }
-
-    generateAuthors(data) {
-        if (this.currentConfig.authors) {
-            return this.currentConfig.authors;
-        }
-        const numAuthors = Math.floor(Math.random() * 3) + 1;
-        const selectedAuthors = [];
-        for (let i = 0; i < numAuthors; i++) {
-            const author = data.sample_authors[Math.floor(Math.random() * data.sample_authors.length)];
-            if (!selectedAuthors.includes(author)) {
-                selectedAuthors.push(author);
-            }
-        }
-        return selectedAuthors.join(', ');
-    }
-
-    generateInstitution(data) {
-        return data.sample_institutions[Math.floor(Math.random() * data.sample_institutions.length)];
-    }
-
-    generateAbstract() {
-        const field = this.currentConfig.field;
-        return `This study investigates fundamental principles within ${field} through comprehensive analysis and methodological innovation. The research employs advanced techniques to examine key variables and their relationships within established theoretical frameworks. Results demonstrate significant correlations and provide novel insights into the underlying mechanisms governing these phenomena. The findings contribute to current understanding while identifying important directions for future research. Statistical analysis confirms the validity of the proposed hypotheses and supports the development of enhanced methodological approaches. These discoveries have practical implications for both theoretical advancement and real-world applications in ${field}. The study concludes with recommendations for continued investigation and methodological refinement in this important area of research.`;
-    }
-
-    generateKeywords() {
-        const field = this.currentConfig.field.toLowerCase();
-        const generalKeywords = ['methodology', 'analysis', 'research', 'statistical significance', 'experimental design'];
-        const fieldSpecific = {
-            biology: ['molecular biology', 'genetics', 'cellular processes'],
-            psychology: ['cognitive processes', 'behavioral analysis', 'psychological assessment'],
-            'computer science': ['algorithms', 'data structures', 'computational complexity'],
-            chemistry: ['chemical reactions', 'molecular structure', 'analytical chemistry'],
-            physics: ['theoretical physics', 'experimental methods', 'quantum mechanics']
-        };
-
-        const keywords = [...generalKeywords];
-        if (fieldSpecific[field]) {
-            keywords.push(...fieldSpecific[field]);
-        }
-        return keywords.slice(0, 6).join(', ');
-    }
-
-    generateReferences(data) {
-        const references = [];
-        const numRefs = Math.floor(Math.random() * 5) + 8; // 8-12 references
-
-        for (let i = 0; i < numRefs; i++) {
-            const author = data.sample_authors[Math.floor(Math.random() * data.sample_authors.length)];
-            const journal = data.journal_names[Math.floor(Math.random() * data.journal_names.length)];
-            const year = 2018 + Math.floor(Math.random() * 7); // 2018-2024
-            const volume = Math.floor(Math.random() * 50) + 1;
-            const pages = `${100 + Math.floor(Math.random() * 500)}-${150 + Math.floor(Math.random() * 500)}`;
-            const title = this.generateReferenceTitle();
-
-            references.push(`${author.replace('Dr. ', '').replace('Prof. ', '')} (${year}). ${title} ${journal}, ${volume}, ${pages}.`);
-        }
-
-        return references;
-    }
-
-    generateReferenceTitle() {
         const titles = [
-            'Advances in theoretical frameworks and practical applications.',
-            'Methodological innovations in contemporary research practices.',
-            'Statistical approaches to complex data analysis systems.',
-            'Comprehensive analysis of experimental methodologies and outcomes.',
-            'Novel perspectives on established research paradigms.',
-            'Quantitative assessment of theoretical model validation.',
-            'Empirical investigation of fundamental research principles.',
-            'Systematic review of current analytical techniques.'
+            `Advanced Research in ${field}: A Comprehensive Analysis`,
+            `Innovative Approaches to ${field} Research`,
+            `Contemporary Studies in ${field}`,
+            `Emerging Trends in ${field} Research`,
+            `Analytical Framework for ${field} Studies`
         ];
         return titles[Math.floor(Math.random() * titles.length)];
     }
 
+    generateAuthors(data) {
+        const author = this.currentConfig.authors || 'Anonymous Researcher';
+        return author;
+    }
+
+    generateInstitution(data) {
+        const institutions = [
+            'Department of Research, Academic University',
+            'Institute for Advanced Studies',
+            'Research Center for Applied Sciences',
+            'University Research Laboratory'
+        ];
+        return institutions[Math.floor(Math.random() * institutions.length)];
+    }
+
+    generateAbstract() {
+        const field = this.currentConfig.field;
+        return `This research presents a comprehensive investigation into key aspects of ${field}. Through systematic analysis and methodological rigor, this study contributes valuable insights to the existing body of knowledge. The findings demonstrate significant implications for future research and practical applications in the field.`;
+    }
+
+    generateKeywords() {
+        const field = this.currentConfig.field;
+        const keywords = [field, 'research', 'analysis', 'methodology', 'findings'];
+        return keywords.join(', ');
+    }
+
+    generateReferences(data) {
+        const field = this.currentConfig.field;
+        return [
+            `Smith, J. (2023). Foundations of ${field} Research. Academic Press.`,
+            `Johnson, M., & Brown, K. (2022). Contemporary approaches in ${field}. Journal of Research, 15(3), 45-67.`,
+            `Davis, L. (2023). Methodological frameworks for ${field} studies. Research Quarterly, 8(2), 123-145.`,
+            `Wilson, P., et al. (2022). Advanced techniques in ${field} analysis. Scientific Publications.`,
+            `Thompson, R. (2023). Future directions in ${field} research. Annual Review, 12, 78-102.`
+        ];
+    }
+
+    // UPDATED: Enhanced showPreview method with two-column layout support
     showPreview(paperHtml) {
         try {
             console.log('Showing preview...');
             document.getElementById('processing-section').style.display = 'none';
             document.getElementById('preview-section').style.display = 'block';
             document.getElementById('paper-preview').innerHTML = paperHtml;
+
+            // ADDED: Ensure the layout class is properly applied
+            const previewElement = document.getElementById('paper-preview');
+            if (previewElement) {
+                const academicPaper = previewElement.querySelector('.academic-paper');
+                if (academicPaper && this.currentConfig.layout) {
+                    // Remove any existing layout classes
+                    academicPaper.classList.remove('single-column', 'two-column');
+
+                    // Add the correct layout class
+                    const layoutClass = this.currentConfig.layout === 'double' ? 'two-column' : 'single-column';
+                    academicPaper.classList.add(layoutClass);
+
+                    console.log('Layout class applied:', layoutClass);
+                }
+            }
+
             console.log('Preview displayed');
         } catch (error) {
             console.error('Error showing preview:', error);
         }
     }
 
-    // CORRECTED HTML DOWNLOAD FUNCTION WITH JUSTIFIED TEXT
-    downloadPaper() {
+    resetApp() {
         try {
-            const paperContent = document.getElementById('paper-preview').innerHTML;
-            const fullHtml = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Academic Paper</title>
-                    <style>
-                        body {
-                            font-family: 'Times New Roman', serif;
-                            line-height: 1.6;
-                            margin: 40px;
-                            color: #000;
-                            background: white;
-                            text-align: justify;
-                        }
-                        .paper {
-                            max-width: 800px;
-                            margin: 0 auto;
-                            background: white;
-                        }
-                        .paper-title {
-                            font-size: 24px;
-                            font-weight: bold;
-                            text-align: center;
-                            margin-bottom: 20px;
-                            line-height: 1.3;
-                        }
-                        .authors {
-                            text-align: center;
-                            font-size: 14px;
-                            margin-bottom: 10px;
-                        }
-                        .institution {
-                            text-align: center;
-                            font-style: italic;
-                            font-size: 12px;
-                            margin-bottom: 30px;
-                        }
-                        .abstract {
-                            margin: 30px 0;
-                            padding: 20px;
-                            background: #f9f9f9;
-                            border-left: 4px solid #ccc;
-                            text-align: justify;
-                        }
-                        .abstract h3 {
-                            margin-top: 0;
-                            font-size: 16px;
-                            text-align: center;
-                        }
-                        .abstract p {
-                            text-align: justify;
-                        }
-                        .keywords {
-                            margin: 20px 0;
-                            font-size: 12px;
-                            text-align: left;
-                        }
-                        .section {
-                            margin: 30px 0;
-                            text-align: justify;
-                        }
-                        .section h2 {
-                            font-size: 18px;
-                            margin-bottom: 15px;
-                            border-bottom: 2px solid #333;
-                            padding-bottom: 5px;
-                            text-align: left;
-                        }
-                        .section p {
-                            text-align: justify;
-                            text-justify: inter-word;
-                        }
-                        .references {
-                            margin-top: 40px;
-                        }
-                        .references h2 {
-                            font-size: 18px;
-                            margin-bottom: 20px;
-                            text-align: left;
-                        }
-                        .references ol {
-                            padding-left: 20px;
-                        }
-                        .references li {
-                            margin-bottom: 8px;
-                            font-size: 12px;
-                            text-align: justify;
-                        }
-                        .two-column {
-                            column-count: 2;
-                            column-gap: 30px;
-                        }
-                        .single-column {
-                            column-count: 1;
-                        }
-                        p {
-                            text-align: justify;
-                            text-justify: inter-word;
-                        }
-                        @media print {
-                            body { margin: 0; }
-                            .paper { margin: 20px; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    ${paperContent}
-                </body>
-                </html>
-            `;
+            console.log('Resetting app...');
+            this.pdfText = '';
+            this.currentConfig = {};
+            this.currentPaperHtml = '';
 
-            const blob = new Blob([fullHtml], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${this.currentConfig.title || 'academic-paper'}.html`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            document.getElementById('upload-section').style.display = 'block';
+            document.getElementById('upload-progress').style.display = 'none';
+            document.getElementById('config-section').style.display = 'none';
+            document.getElementById('processing-section').style.display = 'none';
+            document.getElementById('preview-section').style.display = 'none';
 
-            console.log('HTML download completed');
+            document.getElementById('pdf-input').value = '';
+            const progressFill = document.getElementById('progress-fill');
+            if (progressFill) progressFill.style.width = '0%';
+
+            console.log('App reset complete');
         } catch (error) {
-            console.error('Error downloading HTML:', error);
-            alert('Error downloading HTML file. Please try again.');
+            console.error('Error resetting app:', error);
         }
     }
 
-    // CORRECTED PDF DOWNLOAD FUNCTION WITH JUSTIFIED TEXT AND MOBILE SUPPORT
-    async downloadPaperAsPdf() {
+    downloadPaper() {
+        if (!this.currentPaperHtml) {
+            alert('No paper available for download. Please generate a paper first.');
+            return;
+        }
+
+        const element = document.createElement('a');
+        const file = new Blob([this.currentPaperHtml], { type: 'text/html' });
+        element.href = URL.createObjectURL(file);
+        element.download = 'academic-paper.html';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    copyPaper() {
+        if (!this.currentPaperHtml) {
+            alert('No paper available to copy. Please generate a paper first.');
+            return;
+        }
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = this.currentPaperHtml;
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+        navigator.clipboard.writeText(textContent).then(() => {
+            alert('Paper content copied to clipboard!');
+        }).catch(err => {
+            console.error('Error copying to clipboard:', err);
+            alert('Error copying to clipboard. Please try again.');
+        });
+    }
+
+    downloadPaperAsPdf() {
         try {
             console.log('Starting PDF download...');
-            
+
             if (!this.currentPaperHtml) {
                 alert('No paper available for download. Please generate a paper first.');
                 return;
@@ -858,7 +732,7 @@ class PaperCloak {
                         }
                         .keywords {
                             margin: 20px 0;
-                            font-size: 12px;
+                            font-size: 11px;
                             text-align: left;
                         }
                         .section {
@@ -875,6 +749,7 @@ class PaperCloak {
                         .section p {
                             text-align: justify;
                             text-justify: inter-word;
+                            font-size: 11px;
                         }
                         .references {
                             margin-top: 40px;
@@ -889,7 +764,7 @@ class PaperCloak {
                         }
                         .references li {
                             margin-bottom: 8px;
-                            font-size: 12px;
+                            font-size: 11px;
                             text-align: justify;
                         }
                         .two-column {
@@ -902,6 +777,7 @@ class PaperCloak {
                         p {
                             text-align: justify;
                             text-justify: inter-word;
+                            font-size: 11px;
                         }
                         /* Mobile-specific styles */
                         @media screen and (max-width: 768px) {
@@ -967,27 +843,15 @@ class PaperCloak {
 
             printWindow.document.write(fullHtml);
             printWindow.document.close();
-            
+
             // Focus the new window
             printWindow.focus();
 
             console.log('PDF download initiated');
-            
+
         } catch (error) {
             console.error('Error downloading PDF:', error);
             alert('Error downloading PDF. Please try again.');
-        }
-    }
-
-    copyPaper() {
-        try {
-            const paperContent = document.getElementById('paper-preview').innerText;
-            navigator.clipboard.writeText(paperContent).then(() => {
-                alert('Paper content copied to clipboard!');
-            });
-        } catch (error) {
-            console.error('Error copying paper:', error);
-            alert('Error copying paper. Please try again.');
         }
     }
 
@@ -995,22 +859,25 @@ class PaperCloak {
         try {
             const historyItem = {
                 id: Date.now(),
-                date: new Date().toLocaleDateString(),
-                time: new Date().toLocaleTimeString(),
                 title: this.currentConfig.title || 'Untitled Paper',
+                authors: this.currentConfig.authors || 'Anonymous',
                 field: this.currentConfig.field,
                 layout: this.currentConfig.layout,
-                html: this.currentPaperHtml
+                html: this.currentPaperHtml,
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString()
             };
 
             let history = JSON.parse(localStorage.getItem('paperCloak_history') || '[]');
-            history.unshift(historyItem); // Add to beginning
-            
-            // Keep only last 50 items
-            history = history.slice(0, 50);
-            
+            history.unshift(historyItem);
+
+            // Keep only the last 10 items
+            if (history.length > 10) {
+                history = history.slice(0, 10);
+            }
+
             localStorage.setItem('paperCloak_history', JSON.stringify(history));
-            this.loadHistory();
+            console.log('Saved to history:', historyItem.title);
         } catch (error) {
             console.error('Error saving to history:', error);
         }
@@ -1018,14 +885,16 @@ class PaperCloak {
 
     loadHistory() {
         try {
-            const historyList = document.getElementById('history-list');
-            if (!historyList) return;
-
             const history = JSON.parse(localStorage.getItem('paperCloak_history') || '[]');
+            const historyList = document.getElementById('history-list');
+
+            if (!historyList) return;
 
             if (history.length === 0) {
                 historyList.innerHTML = `
                     <div class="history-empty">
+                        <div class="empty-icon">📄</div>
+                        <h4>No papers yet</h4>
                         <p>Transform your first PDF to see it here!</p>
                     </div>
                 `;
@@ -1033,15 +902,25 @@ class PaperCloak {
             }
 
             historyList.innerHTML = history.map(item => `
-                <div class="history-item" data-id="${item.id}">
-                    <div class="history-info">
-                        <h3>${item.title}</h3>
-                        <p>Field: ${item.field} | Layout: ${item.layout}</p>
-                        <small>${item.date} at ${item.time}</small>
+                <div class="history-item">
+                    <div class="history-item-header">
+                        <h4>${item.title}</h4>
+                        <span class="history-date">${item.date} at ${item.time}</span>
+                    </div>
+                    <div class="history-item-details">
+                        <span class="history-field">Field: ${item.field}</span>
+                        <span class="history-layout">Layout: ${item.layout}</span>
                     </div>
                     <div class="history-actions">
-                        <button class="btn btn--small" onclick="app.viewHistoryItem(${item.id})">View</button>
-                        <button class="btn btn--small btn--outline" onclick="app.deleteHistoryItem(${item.id})">Delete</button>
+                        <button class="btn btn--sm btn--outline" onclick="app.previewHistoryItem(${item.id})">
+                            👁️ Preview
+                        </button>
+                        <button class="btn btn--sm btn--secondary" onclick="app.downloadHistoryItem(${item.id})">
+                            📥 Download
+                        </button>
+                        <button class="btn btn--sm btn--outline" onclick="app.deleteHistoryItem(${item.id})">
+                            🗑️ Delete
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -1050,40 +929,66 @@ class PaperCloak {
         }
     }
 
-    viewHistoryItem(id) {
+    previewHistoryItem(id) {
         try {
             const history = JSON.parse(localStorage.getItem('paperCloak_history') || '[]');
             const item = history.find(h => h.id === id);
-            
+
             if (item) {
                 this.currentPaperHtml = item.html;
                 this.currentConfig = {
                     title: item.title,
+                    authors: item.authors,
                     field: item.field,
                     layout: item.layout
                 };
-                
-                // Hide history and show preview
-                document.getElementById('history-tab').style.display = 'none';
-                document.getElementById('preview-section').style.display = 'block';
-                document.getElementById('paper-preview').innerHTML = item.html;
-                
-                // Update tab navigation
-                document.querySelector('[data-tab="history"]').classList.remove('active');
-                document.querySelector('[data-tab="transform"]').classList.add('active');
-                document.getElementById('transform-tab').style.display = 'block';
-                document.getElementById('transform-tab').classList.add('active');
+
+                // Switch to transform tab and show preview
+                const transformTab = document.querySelector('[data-tab="transform"]');
+                const historyTab = document.querySelector('[data-tab="history"]');
+
+                if (transformTab && historyTab) {
+                    historyTab.classList.remove('active');
+                    document.getElementById('history-tab').style.display = 'none';
+                    document.getElementById('history-tab').classList.remove('active');
+
+                    transformTab.classList.add('active');
+                    document.getElementById('transform-tab').style.display = 'block';
+                    document.getElementById('transform-tab').classList.add('active');
+                }
+
+                this.showPreview(item.html);
             }
         } catch (error) {
-            console.error('Error viewing history item:', error);
+            console.error('Error previewing history item:', error);
+        }
+    }
+
+    downloadHistoryItem(id) {
+        try {
+            const history = JSON.parse(localStorage.getItem('paperCloak_history') || '[]');
+            const item = history.find(h => h.id === id);
+
+            if (item) {
+                this.currentPaperHtml = item.html;
+                this.currentConfig = {
+                    title: item.title,
+                    authors: item.authors,
+                    field: item.field,
+                    layout: item.layout
+                };
+                this.downloadPaperAsPdf();
+            }
+        } catch (error) {
+            console.error('Error downloading history item:', error);
         }
     }
 
     deleteHistoryItem(id) {
         try {
-            if (confirm('Are you sure you want to delete this item?')) {
+            if (confirm('Are you sure you want to delete this paper from history?')) {
                 let history = JSON.parse(localStorage.getItem('paperCloak_history') || '[]');
-                history = history.filter(item => item.id !== id);
+                history = history.filter(h => h.id !== id);
                 localStorage.setItem('paperCloak_history', JSON.stringify(history));
                 this.loadHistory();
             }
@@ -1094,46 +999,12 @@ class PaperCloak {
 
     clearHistory() {
         try {
-            if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+            if (confirm('Are you sure you want to clear all history? This action cannot be undone.')) {
                 localStorage.removeItem('paperCloak_history');
                 this.loadHistory();
             }
         } catch (error) {
             console.error('Error clearing history:', error);
-        }
-    }
-
-    resetApp() {
-        try {
-            console.log('Resetting app...');
-            
-            // Reset internal state
-            this.pdfText = '';
-            this.currentConfig = {};
-            this.currentPaperHtml = '';
-            
-            // Reset UI
-            document.getElementById('upload-section').style.display = 'block';
-            const sections = ['upload-progress', 'config-section', 'processing-section', 'preview-section'];
-            sections.forEach(sectionId => {
-                const element = document.getElementById(sectionId);
-                if (element) {
-                    element.style.display = 'none';
-                }
-            });
-            
-            // Reset form
-            const form = document.getElementById('config-form');
-            if (form) {
-                form.reset();
-            }
-            
-            // Reset progress
-            this.resetProgress();
-            
-            console.log('App reset complete');
-        } catch (error) {
-            console.error('Error resetting app:', error);
         }
     }
 }
