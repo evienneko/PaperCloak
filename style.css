@@ -1,4 +1,4 @@
-/* PaperCloak Updated CSS - Preview matches PDF output exactly */
+/* PaperCloak Complete CSS - Preview EXACTLY matches PDF output */
 :root {
     /* Primitive Color Tokens */
     --color-white: rgba(255, 255, 255, 1);
@@ -268,7 +268,6 @@
     --color-warning-rgb: var(--color-orange-500-rgb);
     --color-info-rgb: var(--color-slate-500-rgb);
 }
-
 /* Base styles */
 html {
     font-size: var(--font-size-base);
@@ -776,34 +775,40 @@ select.form-control {
     display: flex;
     gap: var(--space-8);
 }
-/* CRITICAL: Academic Paper Styles - Updated to match PDF output exactly with 11px font */
+/* CRITICAL: Academic Paper Styles - EXACTLY matching PDF output with maximum specificity */
+
+/* Paper Preview Container - matches PDF output */
+#paper-preview,
 .paper-preview {
     background-color: white !important;
     border: 1px solid #ddd !important;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-lg) !important;
+    overflow: hidden !important;
+    box-shadow: var(--shadow-lg) !important;
     max-width: 800px !important;
     margin: 0 auto !important;
 }
 
-/* Make the preview paper styles identical to PDF output */
+/* Academic Paper Container - EXACT match to PDF inline styles */
+#paper-preview .academic-paper,
+.paper-preview .academic-paper,
 .academic-paper {
     font-family: 'Times New Roman', Times, serif !important;
     line-height: 1.6 !important;
+    margin: 40px !important;
     color: #000 !important;
-    background-color: #fff !important;
-    padding: 40px !important;
-    margin: 0 auto !important;
-    max-width: 800px !important;
+    background: white !important;
     text-align: justify !important;
-    text-justify: inter-word !important;
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    background: white !important;
+    padding: 40px !important;
+    box-sizing: border-box !important;
 }
 
-.academic-paper * {
-    color: #000 !important;
-}
-
+/* Paper Title - EXACT match */
+#paper-preview .academic-paper .paper-title,
+.paper-preview .academic-paper .paper-title,
 .academic-paper .paper-title {
     font-size: 24px !important;
     font-weight: bold !important;
@@ -813,14 +818,26 @@ select.form-control {
     color: #000 !important;
 }
 
-.academic-paper .paper-authors {
+/* Authors - EXACT match */
+#paper-preview .academic-paper .paper-authors,
+.paper-preview .academic-paper .paper-authors,
+.academic-paper .paper-authors,
+#paper-preview .academic-paper .authors,
+.paper-preview .academic-paper .authors,
+.academic-paper .authors {
     text-align: center !important;
     font-size: 14px !important;
     margin-bottom: 10px !important;
     color: #000 !important;
 }
 
-.academic-paper .paper-institution {
+/* Institution - EXACT match */
+#paper-preview .academic-paper .paper-institution,
+.paper-preview .academic-paper .paper-institution,
+.academic-paper .paper-institution,
+#paper-preview .academic-paper .institution,
+.paper-preview .academic-paper .institution,
+.academic-paper .institution {
     text-align: center !important;
     font-style: italic !important;
     font-size: 12px !important;
@@ -828,16 +845,27 @@ select.form-control {
     color: #000 !important;
 }
 
-.academic-paper .paper-abstract {
+/* Abstract - EXACT match */
+#paper-preview .academic-paper .paper-abstract,
+.paper-preview .academic-paper .paper-abstract,
+.academic-paper .paper-abstract,
+#paper-preview .academic-paper .abstract,
+.paper-preview .academic-paper .abstract,
+.academic-paper .abstract {
     margin: 30px 0 !important;
     padding: 20px !important;
     background: #f9f9f9 !important;
     border-left: 4px solid #ccc !important;
     text-align: justify !important;
-    text-justify: inter-word !important;
 }
 
-.academic-paper .paper-abstract h3 {
+/* Abstract heading - EXACT match */
+#paper-preview .academic-paper .paper-abstract h3,
+.paper-preview .academic-paper .paper-abstract h3,
+.academic-paper .paper-abstract h3,
+#paper-preview .academic-paper .abstract h3,
+.paper-preview .academic-paper .abstract h3,
+.academic-paper .abstract h3 {
     margin-top: 0 !important;
     font-size: 16px !important;
     text-align: center !important;
@@ -845,111 +873,174 @@ select.form-control {
     font-weight: bold !important;
 }
 
-.academic-paper .paper-abstract p {
+/* Abstract paragraph - EXACT match */
+#paper-preview .academic-paper .paper-abstract p,
+.paper-preview .academic-paper .paper-abstract p,
+.academic-paper .paper-abstract p,
+#paper-preview .academic-paper .abstract p,
+.paper-preview .academic-paper .abstract p,
+.academic-paper .abstract p {
     text-align: justify !important;
-    text-justify: inter-word !important;
-    font-size: 11px !important;
     color: #000 !important;
     margin: 0 !important;
+    font-size: 11px !important;
 }
 
-.academic-paper .paper-keywords {
+/* Keywords - EXACT match */
+#paper-preview .academic-paper .paper-keywords,
+.paper-preview .academic-paper .paper-keywords,
+.academic-paper .paper-keywords,
+#paper-preview .academic-paper .keywords,
+.paper-preview .academic-paper .keywords,
+.academic-paper .keywords {
     margin: 20px 0 !important;
     font-size: 11px !important;
     text-align: left !important;
     color: #000 !important;
 }
 
+/* Section - EXACT match */
+#paper-preview .academic-paper .section,
+.paper-preview .academic-paper .section,
+.academic-paper .section {
+    margin: 30px 0 !important;
+    text-align: justify !important;
+}
+
+/* Section headers - EXACT match */
+#paper-preview .academic-paper .section h2,
+.paper-preview .academic-paper .section h2,
+.academic-paper .section h2,
+#paper-preview .academic-paper .section-header,
+.paper-preview .academic-paper .section-header,
 .academic-paper .section-header {
     font-size: 18px !important;
     margin-bottom: 15px !important;
     border-bottom: 2px solid #333 !important;
     padding-bottom: 5px !important;
     text-align: left !important;
-    font-weight: bold !important;
     color: #000 !important;
+    font-weight: bold !important;
     margin-top: 30px !important;
 }
 
-.academic-paper .section-content {
-    font-size: 11px !important;
-    text-align: justify !important;
-    text-justify: inter-word !important;
-    margin-bottom: 15px !important;
-    line-height: 1.6 !important;
-    color: #000 !important;
-}
-
+/* Section content - EXACT match */
+#paper-preview .academic-paper .section p,
+.paper-preview .academic-paper .section p,
+.academic-paper .section p,
+#paper-preview .academic-paper .section-content,
+.paper-preview .academic-paper .section-content,
+.academic-paper .section-content,
+#paper-preview .academic-paper .section-content p,
+.paper-preview .academic-paper .section-content p,
 .academic-paper .section-content p {
-    font-size: 11px !important;
     text-align: justify !important;
     text-justify: inter-word !important;
-    margin-bottom: 10px !important;
     color: #000 !important;
+    font-size: 11px !important;
+    margin-bottom: 10px !important;
+    line-height: 1.6 !important;
 }
 
+/* References - EXACT match */
+#paper-preview .academic-paper .references,
+.paper-preview .academic-paper .references,
 .academic-paper .references {
     margin-top: 40px !important;
 }
 
+/* References heading - EXACT match */
+#paper-preview .academic-paper .references h2,
+.paper-preview .academic-paper .references h2,
+.academic-paper .references h2,
+#paper-preview .academic-paper .references h3,
+.paper-preview .academic-paper .references h3,
 .academic-paper .references h3 {
     font-size: 18px !important;
     margin-bottom: 20px !important;
     text-align: left !important;
-    font-weight: bold !important;
     color: #000 !important;
+    font-weight: bold !important;
     border-bottom: 2px solid #333 !important;
     padding-bottom: 5px !important;
 }
 
+/* References list - EXACT match */
+#paper-preview .academic-paper .references ol,
+.paper-preview .academic-paper .references ol,
 .academic-paper .references ol {
     padding-left: 20px !important;
 }
 
+/* References items - EXACT match */
+#paper-preview .academic-paper .references li,
+.paper-preview .academic-paper .references li,
 .academic-paper .references li,
+#paper-preview .academic-paper .reference-item,
+.paper-preview .academic-paper .reference-item,
 .academic-paper .reference-item {
     margin-bottom: 8px !important;
     font-size: 11px !important;
     text-align: justify !important;
-    text-justify: inter-word !important;
     color: #000 !important;
     line-height: 1.6 !important;
 }
 
-/* Two column layout matching PDF output */
+/* Two column layout - EXACT match */
+#paper-preview .academic-paper.two-column,
+.paper-preview .academic-paper.two-column,
 .academic-paper.two-column {
     column-count: 2 !important;
     column-gap: 30px !important;
-    column-rule: none !important;
 }
 
-.academic-paper.two-column .paper-title,
-.academic-paper.two-column .paper-authors,
-.academic-paper.two-column .paper-institution,
-.academic-paper.two-column .paper-abstract,
-.academic-paper.two-column .paper-keywords {
-    column-span: all !important;
-    margin-bottom: 20px !important;
-}
-
+/* Single column layout - EXACT match */
+#paper-preview .academic-paper.single-column,
+.paper-preview .academic-paper.single-column,
 .academic-paper.single-column {
     column-count: 1 !important;
 }
 
-/* Preserve text formatting in preview */
-.academic-paper .section-content strong,
-.academic-paper .section-content b {
+/* All paragraphs in academic paper - EXACT match */
+#paper-preview .academic-paper p,
+.paper-preview .academic-paper p,
+.academic-paper p {
+    text-align: justify !important;
+    text-justify: inter-word !important;
+    color: #000 !important;
+}
+
+/* Force all text to be black - maximum specificity */
+#paper-preview .academic-paper *,
+.paper-preview .academic-paper *,
+.academic-paper * {
+    color: #000 !important;
+}
+
+/* Preserve text formatting */
+#paper-preview .academic-paper strong,
+.paper-preview .academic-paper strong,
+.academic-paper strong,
+#paper-preview .academic-paper b,
+.paper-preview .academic-paper b,
+.academic-paper b {
     font-weight: bold !important;
     color: #000 !important;
 }
 
-.academic-paper .section-content em,
-.academic-paper .section-content i {
+#paper-preview .academic-paper em,
+.paper-preview .academic-paper em,
+.academic-paper em,
+#paper-preview .academic-paper i,
+.paper-preview .academic-paper i,
+.academic-paper i {
     font-style: italic !important;
     color: #000 !important;
 }
 
-.academic-paper .section-content u {
+#paper-preview .academic-paper u,
+.paper-preview .academic-paper u,
+.academic-paper u {
     text-decoration: underline !important;
     color: #000 !important;
 }
@@ -957,38 +1048,50 @@ select.form-control {
 /* Print styles */
 @media print {
     .preview-controls {
-        display: none;
+        display: none !important;
     }
 
     .academic-paper {
-        box-shadow: none;
-        border: none;
-        margin: 0;
-        padding: 20mm;
-        max-width: none;
-    }
-
-    .paper-preview {
-        border: none;
-        box-shadow: none;
-    }
-}
-
-/* Responsive adjustments for preview */
-@media (max-width: 768px) {
-    .academic-paper {
-        padding: 24px !important;
+        box-shadow: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 20mm !important;
         max-width: none !important;
     }
 
+    .paper-preview {
+        border: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #paper-preview .academic-paper,
+    .paper-preview .academic-paper,
+    .academic-paper {
+        padding: 24px !important;
+        max-width: none !important;
+        margin: 20px !important;
+    }
+
+    #paper-preview .academic-paper.two-column,
+    .paper-preview .academic-paper.two-column,
     .academic-paper.two-column {
         column-count: 1 !important;
     }
 
+    #paper-preview .academic-paper .paper-title,
+    .paper-preview .academic-paper .paper-title,
     .academic-paper .paper-title {
         font-size: 20px !important;
     }
 
+    #paper-preview .academic-paper .section h2,
+    .paper-preview .academic-paper .section h2,
+    .academic-paper .section h2,
+    #paper-preview .academic-paper .section-header,
+    .paper-preview .academic-paper .section-header,
     .academic-paper .section-header {
         font-size: 16px !important;
     }
@@ -1599,3 +1702,5 @@ select.form-control {
         gap: var(--space-8);
     }
 }
+
+/* END OF CSS */
