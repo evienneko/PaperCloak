@@ -11,6 +11,7 @@ Want to sneak some reading without getting caught? PaperCloak transforms any PDF
 ## How to Use
 
 Upload your PDF, tweak the title/authors/layout if you want, hit “Transform,” and boom! Your undercover paper is ready.
+Use a desktop browser for better use and results.
 
 ## Deployment & Development
 
