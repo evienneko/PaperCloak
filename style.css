@@ -1702,5 +1702,65 @@ select.form-control {
         gap: var(--space-8);
     }
 }
+/* COMPLETE FIX for Two-Column Layout in Preview */
 
+/* Force two-column layout with maximum specificity */
+body #paper-preview .academic-paper.two-column,
+body .paper-preview .academic-paper.two-column,
+html body #paper-preview .academic-paper.two-column {
+    column-count: 2 !important;
+    column-gap: 30px !important;
+    column-rule: none !important;
+    column-fill: balance !important;
+    -webkit-column-count: 2 !important;
+    -moz-column-count: 2 !important;
+    -webkit-column-gap: 30px !important;
+    -moz-column-gap: 30px !important;
+}
+
+/* Force single-column layout with maximum specificity */
+body #paper-preview .academic-paper.single-column,
+body .paper-preview .academic-paper.single-column,
+html body #paper-preview .academic-paper.single-column {
+    column-count: 1 !important;
+    -webkit-column-count: 1 !important;
+    -moz-column-count: 1 !important;
+}
+
+/* Ensure spanning elements work in two-column layout */
+body #paper-preview .academic-paper.two-column .paper-title,
+body #paper-preview .academic-paper.two-column .paper-authors,
+body #paper-preview .academic-paper.two-column .paper-institution,
+body #paper-preview .academic-paper.two-column .paper-abstract,
+body #paper-preview .academic-paper.two-column .paper-keywords,
+body .paper-preview .academic-paper.two-column .paper-title,
+body .paper-preview .academic-paper.two-column .paper-authors,
+body .paper-preview .academic-paper.two-column .paper-institution,
+body .paper-preview .academic-paper.two-column .paper-abstract,
+body .paper-preview .academic-paper.two-column .paper-keywords {
+    column-span: all !important;
+    -webkit-column-span: all !important;
+    -moz-column-span: all !important;
+    margin-bottom: 20px !important;
+}
+
+/* Prevent column breaks inside paragraphs and sections */
+body #paper-preview .academic-paper.two-column .section-content,
+body #paper-preview .academic-paper.two-column .section-content p,
+body .paper-preview .academic-paper.two-column .section-content,
+body .paper-preview .academic-paper.two-column .section-content p {
+    break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    -moz-column-break-inside: avoid !important;
+}
+
+/* Mobile responsive - force single column on small screens */
+@media (max-width: 768px) {
+    body #paper-preview .academic-paper.two-column,
+    body .paper-preview .academic-paper.two-column {
+        column-count: 1 !important;
+        -webkit-column-count: 1 !important;
+        -moz-column-count: 1 !important;
+    }
+}
 /* END OF CSS */
