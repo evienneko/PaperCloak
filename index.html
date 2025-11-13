@@ -6,9 +6,8 @@
   <title>PaperCloak v3</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body data-theme="light">
+<body>
   <div class="container">
-
     <header class="app-header">
       <h1 id="app-logo" class="app-logo">PaperCloak</h1>
       <p class="app-subtitle">
@@ -18,12 +17,10 @@
         <span class="theme-icon">🌙</span>
       </button>
     </header>
-
     <nav class="tab-navigation">
       <button class="tab-button active" data-tab="transform">Transform</button>
       <button class="tab-button" data-tab="history">History</button>
     </nav>
-
     <main>
       <section id="transform-tab" class="tab-content active">
         <div id="upload-section">
@@ -50,17 +47,13 @@
               <option value="biology">Biology</option>
             </select>
           </label>
-
           <label class="layout-option">
             <input type="radio" name="layout" value="single" checked /> Single column
           </label>
           <label class="layout-option">
             <input type="radio" name="layout" value="double" /> Two columns
           </label>
-
-          <button id="transform-btn" class="btn btn--primary">
-            Transform to Paper
-          </button>
+          <button id="transform-btn" class="btn btn--primary">Transform to Paper</button>
         </div>
 
         <div id="processing-section" style="display:none;">
@@ -70,10 +63,9 @@
         <div id="preview-section" style="display:none;">
           <div class="paper-preview">
             <article id="paper-container" class="academic-paper single-column" aria-label="Academic Paper Preview">
-              <!-- Paper HTML content here -->
+              <!-- Paper HTML output here -->
             </article>
           </div>
-
           <div class="preview-controls">
             <button id="download-btn" class="btn btn--secondary">Download Text</button>
             <button id="download-pdf-btn" class="btn btn--secondary">Download PDF</button>
@@ -82,14 +74,12 @@
           </div>
         </div>
       </section>
-
       <section id="history-tab" class="tab-content">
         <h2>History</h2>
         <div id="history-list"></div>
       </section>
     </main>
   </div>
-
   <script src="app.js"></script>
 </body>
 </html>
