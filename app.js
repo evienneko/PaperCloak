@@ -17,7 +17,8 @@ class PaperCloak {
 
   setupPdfJs() {
     if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
   }
 
@@ -45,12 +46,12 @@ class PaperCloak {
   setupTabNavigation() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
-    tabButtons.forEach(button => {
-      button.addEventListener('click', e => {
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', (e) => {
         e.preventDefault();
         const tabName = button.getAttribute('data-tab');
-        tabButtons.forEach(btn => btn.classList.remove('active'));
-        tabContents.forEach(content => {
+        tabButtons.forEach((btn) => btn.classList.remove('active'));
+        tabContents.forEach((content) => {
           content.classList.remove('active');
           content.style.display = 'none';
         });
@@ -68,104 +69,86 @@ class PaperCloak {
   }
 
   setupEventListeners() {
-    const appLogo = document.getElementById('app-logo');
-    if (appLogo) appLogo.addEventListener('click', () => this.goToHome());
-
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) themeToggle.addEventListener('click', () => this.toggleTheme());
-
-    const pdfInput = document.getElementById('pdf-input');
-    if (pdfInput) pdfInput.onchange = (e) => this.handleFileSelect(e);
-
-    const uploadArea = document.getElementById('upload-area');
-    if (uploadArea) {
-      uploadArea.onclick = () => this.triggerFileInput();
-      uploadArea.ondragover = (e) => this.handleDragOver(e);
-      uploadArea.ondragleave = (e) => this.handleDragLeave(e);
-      uploadArea.ondrop = (e) => this.handleDrop(e);
-    }
-
-    const transformBtn = document.getElementById('transform-btn');
-    if (transformBtn) transformBtn.onclick = () => this.transformToPaper();
-
-    const newUploadBtn = document.getElementById('new-upload-btn');
-    if (newUploadBtn) newUploadBtn.onclick = () => this.resetApp();
-
-    document.getElementById('download-btn').onclick = () => this.downloadPaper();
-    document.getElementById('copy-btn').onclick = () => this.copyPaper();
-    document.getElementById('download-pdf-btn').onclick = () => this.downloadPaperAsPdf();
+    document.getElementById('theme-toggle')?.addEventListener('click', () => this.toggleTheme());
+    document.getElementById('pdf-input')?.addEventListener('change', (e) => this.handleFileSelect(e));
+    document.getElementById('upload-area')?.addEventListener('click', () => this.triggerFileInput());
+    document.getElementById('transform-btn')?.addEventListener('click', () => this.transformToPaper());
+    document.getElementById('new-upload-btn')?.addEventListener('click', () => this.resetApp());
+    document.getElementById('download-btn')?.addEventListener('click', () => this.downloadPaper());
+    document.getElementById('copy-btn')?.addEventListener('click', () => this.copyPaper());
+    document.getElementById('download-pdf-btn')?.addEventListener('click', () => this.downloadPaperAsPdf());
   }
 
-  // Implement remaining methods such as handleFileSelect, triggerFileInput, handleDragOver, etc.
-  // Plus transformToPaper, generateAcademicPaper, showPreview, downloadPaper, copyPaper, etc.
+  // -- Placeholder implementations for file and preview logic --
+  triggerFileInput() {
+    document.getElementById('pdf-input')?.click();
+  }
+
+  handleFileSelect(e) {
+    const file = e.target.files[0];
+    // Simulate extraction
+    this.pdfText = file ? 'Simulated PDF Extraction Text' : '';
+    document.getElementById('upload-section').style.display = 'none';
+    document.getElementById('config-section').style.display = 'block';
+  }
 
   transformToPaper() {
     if (!this.pdfText.trim()) {
       alert('No content available. Please upload a PDF.');
       return;
     }
-    this.showProcessing();
-
+    document.getElementById('processing-section').style.display = 'block';
+    document.getElementById('config-section').style.display = 'none';
     this.currentConfig = {
       title: document.getElementById('paper-title').value.trim(),
       authors: document.getElementById('author-names').value.trim(),
       field: document.getElementById('research-field').value,
       layout: document.querySelector('input[name="layout"]:checked').value,
     };
-
     setTimeout(() => {
-      const paperHtml = this.generateAcademicPaper();
-      this.currentPaperHtml = paperHtml;
-      this.showPreview(paperHtml);
-      this.saveToHistory();
-    }, 2000);
+      this.showPreview(this.generateAcademicPaper());
+      document.getElementById('processing-section').style.display = 'none';
+    }, 1200);
   }
 
   generateAcademicPaper() {
-    const layoutClass = this.currentConfig.layout === 'double' ? 'academic-paper two-column' : 'academic-paper single-column';
+    const layoutClass =
+      this.currentConfig.layout === 'double'
+        ? 'academic-paper two-column'
+        : 'academic-paper single-column';
 
-    let abstractHTML = `<section class="abstract"><strong>Abstract:</strong> This is a sample abstract text. Replace with real extracted content.</section>`;
-    let keywordsHTML = `<section class="keywords">Keywords: sample, academic, paper, PDF</section>`;
-
-    let bodyHTML = `
+    return `
       <h1 class="title">${this.currentConfig.title || 'Untitled Paper'}</h1>
       <div class="authors">${this.currentConfig.authors || 'Anonymous Authors'}</div>
-      ${abstractHTML}
-      ${keywordsHTML}
+      <section class="abstract"><strong>Abstract:</strong> This is a sample abstract text.</section>
+      <section class="keywords">Keywords: sample, academic, paper, PDF</section>
       <h2 class="section-title">Introduction</h2>
       <div class="section-content">This is a sample introduction section content.</div>
       <h2 class="section-title">Methods</h2>
-      <div class="section-content">Methods section content goes here.</div>
+      <div class="section-content">Methods section here.</div>
       <h2 class="section-title">Results</h2>
-      <div class="section-content">Results section content goes here.</div>
+      <div class="section-content">Results section here.</div>
       <h2 class="section-title">Discussion</h2>
-      <div class="section-content">Discussion section content goes here.</div>
+      <div class="section-content">Discussion section here.</div>
       <h2 class="section-title">References</h2>
       <div class="references">
-        <div class="reference-item">[1] Reference details here.</div>
+        <div class="reference-item">[1] Reference details as sample.</div>
       </div>
     `;
-    return `<article class="${layoutClass}">${bodyHTML}</article>`;
   }
 
   showPreview(html) {
-    const previewSection = document.getElementById('preview-section');
+    document.getElementById('preview-section').style.display = 'block';
+    document.getElementById('upload-section').style.display = 'none';
+    document.getElementById('config-section').style.display = 'none';
     const paperContainer = document.getElementById('paper-container');
-    if (paperContainer && previewSection) {
-      paperContainer.innerHTML = html;
-      previewSection.style.display = 'block';
-
-      const layout = this.currentConfig.layout;
-      paperContainer.className = layout === 'double' ? 'academic-paper two-column' : 'academic-paper single-column';
-    }
+    const layout = this.currentConfig.layout;
+    paperContainer.className =
+      layout === 'double' ? 'academic-paper two-column' : 'academic-paper single-column';
+    paperContainer.innerHTML = html;
   }
 
-  saveToHistory() {
-    // Implement saving the current paper to history (localStorage or server-side)
-  }
-  
   resetApp() {
-    // Reset the app to initial state for new upload
     this.pdfText = '';
     this.currentConfig = {};
     this.currentPaperHtml = '';
@@ -174,9 +157,12 @@ class PaperCloak {
     document.getElementById('config-section').style.display = 'none';
     document.getElementById('pdf-input').value = '';
   }
+
+  downloadPaper() { alert('Download Text! (implementation omitted)'); }
+  copyPaper() { alert('Copied! (implementation omitted)'); }
+  downloadPaperAsPdf() { alert('Download PDF! (implementation omitted)'); }
+  loadHistory() { document.getElementById('history-list').innerHTML = 'No history (mockup)'; }
 }
 
-// Initialize the app on window load
-window.onload = () => {
-  window.paperCloakApp = new PaperCloak();
-};
+// -- Initialize the app --
+window.onload = () => new PaperCloak();
