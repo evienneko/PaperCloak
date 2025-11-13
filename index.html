@@ -1,180 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PaperCloak - PDF to Academic Paper Transformer</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PaperCloak v3</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body data-theme="light">
-    <div class="container">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-content">
-                <div>
-                    <h1 id="app-logo" class="app-logo">📄 PaperCloak</h1>
-                    <p class="app-subtitle">Transform your PDFs into professional academic papers. Read without getting caught!</p>
-                </div>
-                <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-icon">🌙</span>
-                </button>
-            </div>
-        </header>
+  <div class="container">
 
-        <!-- Navigation Tabs -->
-        <div class="tab-navigation">
-            <button class="tab-button active" data-tab="transform">
-                <span class="tab-icon">📄</span>
-                Transform
-            </button>
-            <button class="tab-button" data-tab="history">
-                <span class="tab-icon">📚</span>
-                History
-            </button>
+    <header class="app-header">
+      <h1 id="app-logo" class="app-logo">PaperCloak</h1>
+      <p class="app-subtitle">
+        Transform your PDFs into professional academic papers.
+      </p>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+    </header>
+
+    <nav class="tab-navigation">
+      <button class="tab-button active" data-tab="transform">Transform</button>
+      <button class="tab-button" data-tab="history">History</button>
+    </nav>
+
+    <main>
+      <section id="transform-tab" class="tab-content active">
+        <div id="upload-section">
+          <div id="upload-area" class="upload-area">
+            Drag and drop your PDF file here, or click to browse
+          </div>
+          <input type="file" id="pdf-input" accept="application/pdf" hidden />
         </div>
 
-        <!-- Transform Tab Content -->
-        <div id="transform-tab" class="tab-content active">
-            <!-- Upload Section -->
-            <div id="upload-section" class="section">
-                <div class="upload-container">
-                    <div id="upload-area" class="upload-area">
-                        <div class="upload-icon">📁</div>
-                        <h3>Upload your file</h3>
-                        <p>Drag and drop your PDF file here, or click to browse</p>
-                        <input type="file" id="pdf-input" accept=".pdf" style="display: none;">
-                    </div>
-                </div>
-            </div>
+        <div id="config-section" style="display:none;">
+          <label>
+            Title:<br />
+            <input type="text" id="paper-title" />
+          </label>
+          <label>
+            Authors:<br />
+            <input type="text" id="author-names" />
+          </label>
+          <label>
+            Research Field:<br />
+            <select id="research-field">
+              <option value="physics">Physics</option>
+              <option value="chemistry">Chemistry</option>
+              <option value="biology">Biology</option>
+            </select>
+          </label>
 
-            <!-- Upload Progress -->
-            <div id="upload-progress" class="section" style="display: none;">
-                <div class="upload-progress">
-                    <div class="progress-bar">
-                        <div id="progress-fill" class="progress-fill"></div>
-                    </div>
-                    <p id="progress-text">Uploading...</p>
-                </div>
-            </div>
+          <label class="layout-option">
+            <input type="radio" name="layout" value="single" checked /> Single column
+          </label>
+          <label class="layout-option">
+            <input type="radio" name="layout" value="double" /> Two columns
+          </label>
 
-            <!-- Configuration Section -->
-            <div id="config-section" class="section" style="display: none;">
-                <div class="card config-card">
-                    <div class="card__header">
-                        <h3>📋 Configure Your Academic Paper</h3>
-                        <p class="config-subtitle">Customize the settings for your paper transformation</p>
-                    </div>
-                    <div class="card__body">
-                        <div class="form-group">
-                            <label for="paper-title" class="form-label">📝 Paper Title</label>
-                            <input type="text" id="paper-title" class="form-control" placeholder="Leave blank for auto-generated title">
-                        </div>
-                        <div class="form-group">
-                            <label for="author-names" class="form-label">👥 Author Names</label>
-                            <input type="text" id="author-names" class="form-control" placeholder="Leave blank for auto-generated authors">
-                        </div>
-                        <div class="form-group">
-                            <label for="research-field" class="form-label">🔬 Research Field</label>
-                            <select id="research-field" class="form-control">
-                                <option value="Biology">Biology</option>
-                                <option value="Psychology">Psychology</option>
-                                <option value="Computer Science">Computer Science</option>
-                                <option value="Chemistry">Chemistry</option>
-                                <option value="Physics">Physics</option>
-                                <option value="Mathematics">Mathematics</option>
-                                <option value="Engineering">Engineering</option>
-                                <option value="Economics">Economics</option>
-                                <option value="Sociology">Sociology</option>
-                                <option value="Environmental Science">Environmental Science</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">📐 Layout Style</label>
-                            <div class="layout-options">
-                                <label class="layout-option">
-                                    <input type="radio" name="layout" value="single" checked>
-                                    <span class="layout-preview">
-                                        <div class="layout-visual single-visual"></div>
-                                        <span>Single Column</span>
-                                    </span>
-                                </label>
-                                <label class="layout-option">
-                                    <input type="radio" name="layout" value="double">
-                                    <span class="layout-preview">
-                                        <div class="layout-visual double-visual"></div>
-                                        <span>Two Column</span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                        <button id="transform-btn" class="btn btn--primary btn--full-width btn--lg">
-                            ✨ Transform to Academic Paper
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Processing Section -->
-            <div id="processing-section" class="section" style="display: none;">
-                <div class="processing-container">
-                    <div class="processing-spinner"></div>
-                    <h3>🔄 Processing Your Document</h3>
-                    <p id="processing-status">Initializing transformation...</p>
-                </div>
-            </div>
-
-            <!-- Preview Section -->
-            <div id="preview-section" class="section" style="display: none;">
-                <div class="preview-controls">
-                    <div class="preview-info">
-                        <h3>🎉 Your Academic Paper</h3>
-                        <p>Your document has been successfully transformed!</p>
-                    </div>
-                    <div class="preview-actions">
-                        <button id="download-pdf-btn" class="btn btn--primary">📄 Download PDF</button>
-                        <button id="download-btn" class="btn btn--secondary">💾 Download HTML</button>
-                        <button id="copy-btn" class="btn btn--outline">📋 Copy Text</button>
-                        <button id="new-upload-btn" class="btn btn--outline">🔄 New Upload</button>
-                    </div>
-                </div>
-                <div class="paper-preview">
-                    <div id="paper-preview" class="academic-paper"></div>
-                </div>
-            </div>
+          <button id="transform-btn" class="btn btn--primary">
+            Transform to Paper
+          </button>
         </div>
 
-        <!-- History Tab Content -->
-        <div id="history-tab" class="tab-content" style="display: none;">
-            <div class="section">
-                <div class="card history-card">
-                    <div class="card__header">
-                        <div class="history-header">
-                            <div class="history-title">
-                                <h3>📚 Conversion History</h3>
-                                <p class="history-subtitle">View and manage your previous conversions</p>
-                            </div>
-                            <button id="clear-history-btn" class="btn btn--outline btn--sm">
-                                🗑️ Clear All
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card__body">
-                        <div id="history-list" class="history-list">
-                            <div class="history-empty">
-                                <div class="empty-icon">📄</div>
-                                <h4>No conversions yet</h4>
-                                <p>Transform your first PDF to see it here!</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div id="processing-section" style="display:none;">
+          <p id="processing-status">Initializing transformation...</p>
         </div>
-    </div>
 
-    <script src="app.js"></script>
+        <div id="preview-section" style="display:none;">
+          <div class="paper-preview">
+            <article id="paper-container" class="academic-paper single-column" aria-label="Academic Paper Preview">
+              <!-- Paper HTML content here -->
+            </article>
+          </div>
+
+          <div class="preview-controls">
+            <button id="download-btn" class="btn btn--secondary">Download Text</button>
+            <button id="download-pdf-btn" class="btn btn--secondary">Download PDF</button>
+            <button id="copy-btn" class="btn btn--secondary">Copy to Clipboard</button>
+            <button id="new-upload-btn" class="btn btn--outline">New Upload</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="history-tab" class="tab-content">
+        <h2>History</h2>
+        <div id="history-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
