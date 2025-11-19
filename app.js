@@ -46,12 +46,12 @@ class PaperCloak {
   setupTabNavigation() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
-    tabButtons.forEach((button) => {
-      button.addEventListener('click', (e) => {
+    tabButtons.forEach(button => {
+      button.addEventListener('click', e => {
         e.preventDefault();
         const tabName = button.getAttribute('data-tab');
-        tabButtons.forEach((btn) => btn.classList.remove('active'));
-        tabContents.forEach((content) => {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => {
           content.classList.remove('active');
           content.style.display = 'none';
         });
@@ -79,14 +79,12 @@ class PaperCloak {
     document.getElementById('download-pdf-btn')?.addEventListener('click', () => this.downloadPaperAsPdf());
   }
 
-  // -- Placeholder implementations for file and preview logic --
   triggerFileInput() {
     document.getElementById('pdf-input')?.click();
   }
 
   handleFileSelect(e) {
     const file = e.target.files[0];
-    // Simulate extraction
     this.pdfText = file ? 'Simulated PDF Extraction Text' : '';
     document.getElementById('upload-section').style.display = 'none';
     document.getElementById('config-section').style.display = 'block';
@@ -164,5 +162,4 @@ class PaperCloak {
   loadHistory() { document.getElementById('history-list').innerHTML = 'No history (mockup)'; }
 }
 
-// -- Initialize the app --
 window.onload = () => new PaperCloak();
