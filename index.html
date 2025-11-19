@@ -29,42 +29,30 @@
           </div>
           <input type="file" id="pdf-input" accept="application/pdf" hidden />
         </div>
-
         <div id="config-section" style="display:none;">
-          <label>
-            Title:<br />
-            <input type="text" id="paper-title" />
-          </label>
-          <label>
-            Authors:<br />
-            <input type="text" id="author-names" />
-          </label>
-          <label>
-            Research Field:<br />
+          <label>Title:<br /><input type="text" id="paper-title" /></label>
+          <label>Authors:<br /><input type="text" id="author-names" /></label>
+          <label>Research Field:<br />
             <select id="research-field">
               <option value="physics">Physics</option>
               <option value="chemistry">Chemistry</option>
               <option value="biology">Biology</option>
             </select>
           </label>
-          <label class="layout-option">
+          <label>
             <input type="radio" name="layout" value="single" checked /> Single column
           </label>
-          <label class="layout-option">
+          <label>
             <input type="radio" name="layout" value="double" /> Two columns
           </label>
           <button id="transform-btn" class="btn btn--primary">Transform to Paper</button>
         </div>
-
         <div id="processing-section" style="display:none;">
           <p id="processing-status">Initializing transformation...</p>
         </div>
-
         <div id="preview-section" style="display:none;">
           <div class="paper-preview">
-            <article id="paper-container" class="academic-paper single-column" aria-label="Academic Paper Preview">
-              <!-- Paper HTML output here -->
-            </article>
+            <article id="paper-container" class="academic-paper single-column" aria-label="Academic Paper Preview"></article>
           </div>
           <div class="preview-controls">
             <button id="download-btn" class="btn btn--secondary">Download Text</button>
