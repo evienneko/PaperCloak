@@ -423,7 +423,7 @@ class PaperCloak {
             const layoutClass = this.currentConfig.layout === 'double' ? 'two-column' : 'single-column';
 
             return `
-                <div class="paper ${layoutClass}">
+                <div class="academic-paper ${layoutClass}">
                     <div class="paper-title">${title}</div>
                     <div class="authors">${authors}</div>
                     <div class="institution">${institution}</div>
