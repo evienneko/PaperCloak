@@ -372,9 +372,8 @@ class PaperCloak {
         title: document.getElementById("paper-title").value.trim(),
         authors: document.getElementById("author-names").value.trim(),
         field: document.getElementById("research-field").value,
-        layout: document.querySelector(
-          "input[name='layout']:checked"
-        ).value,
+        layout: document.querySelector("input[name='layout']:checked")
+          .value,
       };
 
       console.log("Current config:", this.currentConfig);
@@ -399,7 +398,8 @@ class PaperCloak {
     try {
       console.log("Showing processing...");
       document.getElementById("config-section").style.display = "none";
-      document.getElementById("processing-section").style.display = "block";
+      document.getElementById("processing-section").style.display =
+        "block";
 
       const statuses = [
         "Analyzing content structure...",
@@ -423,6 +423,9 @@ class PaperCloak {
       console.error("Error showing processing:", error);
     }
   }
+
+  // CORE PAPER GENERATION
+  // This preserves your original academic-paper structure and styling.
 
   generateAcademicPaper() {
     try {
@@ -455,14 +458,14 @@ class PaperCloak {
         .map((ref) => `<li>${ref}</li>`)
         .join("");
 
-      const isTwoColumn = this.currentConfig.layout === "double";
-      const bodyWrapperClass = isTwoColumn
-        ? "paper-body two-column"
-        : "paper-body single-column";
+      const layoutClass =
+        this.currentConfig.layout === "double"
+          ? "two-column"
+          : "single-column";
 
+      // IMPORTANT: matches your CSS selectors in style-3.css
       return `
-      <div class="paper-preview">
-        <div class="academic-paper">
+        <div class="academic-paper ${layoutClass}">
           <div class="paper-title">${title}</div>
           <div class="paper-authors">${authors}</div>
           <div class="paper-institution">${institution}</div>
@@ -473,22 +476,19 @@ class PaperCloak {
           </div>
 
           <div class="paper-keywords">
-            <strong>Keywords:</strong> ${keywords}</strong>
+            <strong>Keywords:</strong> ${keywords}
           </div>
 
-          <div class="${bodyWrapperClass}">
-            ${sectionsHtml}
+          ${sectionsHtml}
 
-            <div class="references">
-              <h2>References</h2>
-              <ol>
-                ${referencesHtml}
-              </ol>
-            </div>
+          <div class="references">
+            <h2>References</h2>
+            <ol>
+              ${referencesHtml}
+            </ol>
           </div>
         </div>
-      </div>
-    `;
+      `;
     } catch (error) {
       console.error("Error generating academic paper", error);
       return `<div class="error">Error generating paper content. Please try again.</div>`;
@@ -523,20 +523,6 @@ class PaperCloak {
         "International Journal of Innovation",
         "Research Quarterly Review",
         "Journal of Applied Sciences",
-      ],
-      methodTerms: [
-        "systematic data collection",
-        "experimental protocols",
-        "established guidelines",
-        "statistical analysis",
-        "quality control measures",
-        "data integrity",
-      ],
-      resultTerms: [
-        "significant correlations",
-        "patterns",
-        "comprehensive evaluation",
-        "comparative analysis",
       ],
     };
   }
@@ -717,7 +703,7 @@ class PaperCloak {
 
   generateReferences(data) {
     const references = [];
-    const numRefs = Math.floor(Math.random() * 4) + 8; // 8-11
+    const numRefs = Math.floor(Math.random() * 4) + 8; // 8–11
 
     for (let i = 0; i < numRefs; i++) {
       const author =
@@ -730,7 +716,7 @@ class PaperCloak {
         data.journalNames[
           Math.floor(Math.random() * data.journalNames.length)
         ];
-      const year = 2018 + Math.floor(Math.random() * 7); // 2018–2024
+      const year = 2018 + Math.floor(Math.random() * 7);
       const volume = Math.floor(Math.random() * 50) + 1;
       const pagesStart = Math.floor(Math.random() * 300) + 1;
       const pagesEnd = pagesStart + Math.floor(Math.random() * 10) + 5;
@@ -776,7 +762,7 @@ class PaperCloak {
     }
   }
 
-  // DOWNLOADS
+  // DOWNLOADS – now reuse preview HTML + style.css
 
   downloadPaper() {
     try {
@@ -819,13 +805,11 @@ class PaperCloak {
     try {
       console.log("Starting PDF download...");
       if (!this.currentPaperHtml) {
-        alert("No paper available for download. Please generate a paper first.");
+        alert(
+          "No paper available for download. Please generate a paper first."
+        );
         return;
       }
-
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      );
 
       const printWindow = window.open(
         "",
@@ -876,6 +860,10 @@ class PaperCloak {
 
   copyPaper() {
     try {
+      if (!this.currentPaperHtml) {
+        alert("No paper available to copy.");
+        return;
+      }
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = this.currentPaperHtml;
       const textContent = tempDiv.innerText;
@@ -990,7 +978,9 @@ class PaperCloak {
       }
 
       const transformTab = document.querySelector("[data-tab='transform']");
-      const historyTabButton = document.querySelector("[data-tab='history']");
+      const historyTabButton = document.querySelector(
+        "[data-tab='history']"
+      );
       if (historyTabButton && transformTab) {
         historyTabButton.classList.remove("active");
         transformTab.classList.add("active");
