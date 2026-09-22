@@ -537,24 +537,87 @@ class PaperCloak {
     }
   }
 
-  downloadPaperAsPdf() {
+  /* ---------------- PDF export (FIXED) ----------------
+     Previously this used window.print(), which forces Chrome into
+     "paged" rendering. In paged mode, CSS multi-column layout fills
+     sequentially instead of balancing (since the container has no
+     fixed height), so two-column papers collapsed into one endless
+     column across 100+ pages.
+
+     Fix: render the paper into an off-screen, fixed-width container
+     using normal (non-print) document flow — where columns balance
+     correctly, exactly like the on-screen preview — then screenshot
+     it with html2canvas and slice that image into PDF pages with
+     jsPDF. This guarantees the PDF always matches the preview,
+     whether it's single- or two-column. */
+  async downloadPaperAsPdf() {
+    if (!this.currentPaperHtml) {
+      alert('No paper available for download. Please generate a paper first.');
+      return;
+    }
+
+    const btn = document.getElementById('download-pdf-btn');
+    const originalText = btn ? btn.textContent : '';
+    if (btn) {
+      btn.textContent = 'Generating PDF...';
+      btn.disabled = true;
+    }
+
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '-99999px';
+    container.style.left = '0';
+    container.style.width = '800px';
+    container.style.background = '#ffffff';
+    container.innerHTML = `<style>${PAPER_EXPORT_CSS}</style>${this.currentPaperHtml}`;
+    document.body.appendChild(container);
+
     try {
-      if (!this.currentPaperHtml) {
-        alert('No paper available for download. Please generate a paper first.');
-        return;
+      if (typeof html2canvas === 'undefined' || !window.jspdf) {
+        throw new Error('PDF libraries not loaded');
       }
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      if (!printWindow) {
-        alert('Please allow popups for this site to download the PDF.');
-        return;
+
+      // Let layout (including column balancing) settle before capture
+      await this.sleep(80);
+
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        backgroundColor: '#ffffff',
+        windowWidth: 800,
+        useCORS: true,
+      });
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgData = canvas.toDataURL('image/png');
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
       }
-      const html = this.buildExportDocument({ includePrintButton: true });
-      printWindow.document.write(html);
-      printWindow.document.close();
-      printWindow.focus();
+
+      pdf.save(`${this.currentConfig.title || 'academic-paper'}.pdf`);
     } catch (error) {
       console.error('Error downloading PDF:', error);
       alert('Error downloading PDF. Please try again.');
+    } finally {
+      document.body.removeChild(container);
+      if (btn) {
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
     }
   }
 
